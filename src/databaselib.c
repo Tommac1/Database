@@ -116,6 +116,10 @@ struct Person *lookUp(struct Person *pplArray[], char *s, char param)
 	return NULL;
 }
 
+int loadPerson(struct Person *pplArray[], struct Person *person) {
+
+}
+
 unsigned hash(char *s)
 {
 	return *s - 'A';

@@ -11,7 +11,7 @@
 #define NUMPEOPLE 1024
 #define NUMNAMES 20
 #define NUMSURNAMES 23
-#define NELEMS(x) (sizeof(x)/sizeof(*(x))
+#define NELEMS(x) (sizeof(x)/sizeof(*(x)))
 
 #define FILENAME "people.txt"
 

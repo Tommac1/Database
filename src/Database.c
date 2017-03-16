@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 
 	}
 	int c, flags = 0;
-	int i;
+	int i = 0;
 
 	enum { ADD = 01, DEL = 02, FIND = 04, LOAD = 010, CREATE = 020 };
 
