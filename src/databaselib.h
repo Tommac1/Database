@@ -15,9 +15,11 @@
 
 #define FILENAME "people.txt"
 
+#define MAXLINE 1024
+
 struct Person *personCreate(char *name, char *surname, int age);
 int createPeopleDB();
 unsigned hash(char *s);
-struct Person *lookUp(struct Person *pplArray[], char *s, char param);
+struct Person *lookUp(struct Person *pplArray[], char *name, char *sur);
 
 #endif /* DATABASELIB_H_ */

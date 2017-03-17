@@ -37,7 +37,6 @@ int main(int argc, char *argv[])
 			switch (c) {
 			case 'a':
 				flags |= ADD;
-				return (flagCreate() ? EXIT_SUCCESS : EXIT_FAILURE);
 				break;
 			case 'd':
 				flags |= DEL;
@@ -50,6 +49,7 @@ int main(int argc, char *argv[])
 				break;
 			case 'c':
 				flags |= CREATE;
+				return (flagCreate() ? EXIT_SUCCESS : EXIT_FAILURE);
 				break;
 			default:
 				printf("unknown parameter: -%c\n", c);
@@ -65,8 +65,10 @@ int flagCreate()
 	if (!createPeopleDB()) {
 		printf("Database creation successfull\nCheck file >%s\n", FILENAME);
 		return EXIT_SUCCESS;
-	} else
+	} else {
+		printf("Error creating database.");
 		return EXIT_FAILURE;
+	}
 }
 
 int flagDelete(int loaded)
@@ -75,9 +77,13 @@ int flagDelete(int loaded)
 		printf("Before deleting any record you have to load database!\n");
 		exit(EXIT_FAILURE);
 	}
+
 	char *name, *surname;
 
-	printf("Insert name and surname : ");
 
+}
+
+int flagLoad()
+{
 
 }

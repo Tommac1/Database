@@ -97,27 +97,61 @@ struct Person *personCreate(char *name, char *surname, int age)
 	return np;
 }
 
-struct Person *lookUp(struct Person *pplArray[], char *s, char param)
+int writePerson(struct Person *p)
+{
+	pFile = fopen(FILENAME, "a+");
+	if (!fprintf(pFile, "%s %s %d\n", p->name, p->surname, p->age)) {
+		printf("Error writing person to file\nDid you create the database with -c parameter?\n");
+		fclose(pFile);
+		free(p);
+		return EXIT_FAILURE;
+	} else {
+		printf("Adding person successful.");
+		free(p);
+		fclose(pFile);
+		return EXIT_SUCCESS;
+	}
+}
+
+struct Person *lookUp(struct Person *pplArray[], char *name, char *sur)
 {
 	struct Person *pPerson;
 
-	if (param == 'n') {
-		for (pPerson = pplArray[hash(s)]; pPerson != NULL; pPerson = pPerson->next)
-			if (strcmp(s, pPerson->name) == 0)
-				return pPerson;
-	} else if (param == 's') {
-		for (pPerson = pplArray[hash(s)]; pPerson != NULL; pPerson = pPerson->next)
-			if (strcmp(s, pPerson->surname) == 0)
-				return pPerson;
-	} else {
-		printf("unknown lookUp param %c\n", param);
-		exit(EXIT_FAILURE);
-	}
+	for (pPerson = pplArray[hash(sur)]; pPerson != NULL; pPerson = pPerson->next)
+		if ((strcmp(sur, pPerson->surname) == 0) && (strcmp(name, pPerson->name) == 0))
+			return pPerson;
+
 	return NULL;
 }
 
-int loadPerson(struct Person *pplArray[], struct Person *person) {
+struct Person *hashPosition(struct Person *pplArray[], char *sur)
+{
+	int hashval = hash(sur);
+	struct Person *np;
+	for (np = pplArray[hashval]; np != NULL; np = np->next)
+		;
+	return np;
+}
 
+int loadDB(struct Person *a[])
+{
+	pFile = fopen(FILENAME, "r");
+	struct Person *np;
+
+	char *line, *name, *surname;
+	int i, c, age;
+
+	while ((i = getline(line, (size_t *) MAXLINE, pFile)) > 0) {
+		sscanf(line, " %s %s %d ", surname, name, age);
+
+		if ((np = hashPosition())) {
+			np = personCreate(name, surname, age);
+		} else {
+			printf("Error loading db.\n");
+			return EXIT_FAILURE;
+		}
+	}
+	return EXIT_SUCCESS;
 }
 
 unsigned hash(char *s)
