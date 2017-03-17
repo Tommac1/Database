@@ -17,6 +17,7 @@ static struct Person *peopleDatabase[26];
 
 int flagCreate();
 int flagDelete(int loaded);
+int flagLoad();
 
 int main(int argc, char *argv[])
 {
@@ -40,12 +41,14 @@ int main(int argc, char *argv[])
 				break;
 			case 'd':
 				flags |= DEL;
+				flagDelete(flags & LOAD);
 				break;
 			case 'f':
 				flags |= FIND;
 				break;
 			case 'l':
 				flags |= LOAD;
+				return (flagLoad() ? EXIT_SUCCESS : EXIT_FAILURE);
 				break;
 			case 'c':
 				flags |= CREATE;
@@ -85,5 +88,21 @@ int flagDelete(int loaded)
 
 int flagLoad()
 {
+	pFile = fopen(FILENAME, "r");
+	struct Person *np;
 
+	char *line, *name, *surname;
+	int i, c, age;
+/* 97 line got crashing error (getline func, use another instead) */
+	while ((i = getline(&line, (size_t *) MAXLINE, pFile)) > 0) {
+		sscanf(line, " %s %s %d ", surname, name, &age);
+
+		if ((np = hashPosition(peopleDatabase, surname))) {
+			np = personCreate(name, surname, age);
+		} else {
+			printf("Error loading db.\n");
+			return EXIT_FAILURE;
+		}
+	}
+	return EXIT_SUCCESS;
 }

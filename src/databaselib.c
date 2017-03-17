@@ -12,7 +12,7 @@
 
 #include "databaselib.h"
 
-FILE *pFile;
+//FILE *pFile;
 
 struct Person {
 	struct Person *next;
@@ -131,27 +131,6 @@ struct Person *hashPosition(struct Person *pplArray[], char *sur)
 	for (np = pplArray[hashval]; np != NULL; np = np->next)
 		;
 	return np;
-}
-
-int loadDB(struct Person *a[])
-{
-	pFile = fopen(FILENAME, "r");
-	struct Person *np;
-
-	char *line, *name, *surname;
-	int i, c, age;
-
-	while ((i = getline(line, (size_t *) MAXLINE, pFile)) > 0) {
-		sscanf(line, " %s %s %d ", surname, name, age);
-
-		if ((np = hashPosition())) {
-			np = personCreate(name, surname, age);
-		} else {
-			printf("Error loading db.\n");
-			return EXIT_FAILURE;
-		}
-	}
-	return EXIT_SUCCESS;
 }
 
 unsigned hash(char *s)
