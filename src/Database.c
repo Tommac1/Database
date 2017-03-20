@@ -10,14 +10,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "databaselib.h"
 
 static struct Person *peopleDatabase[26];
 
 int flagCreate();
-int flagDelete(int loaded);
+int flagDelete(int load);
 int flagLoad();
+int flagAge(int load);
+int flagPrint(int load);
+void saveDB();
 
 int main(int argc, char *argv[])
 {
@@ -29,15 +33,18 @@ int main(int argc, char *argv[])
 
 	}
 	int c, flags = 0;
-	int i = 0;
 
 	enum { ADD = 01, DEL = 02, FIND = 04, LOAD = 010, CREATE = 020 };
 
 	while (--argc > 0 && (*++argv)[0] == '-') {
-		while (c = *++argv[0])
+		while ((c = *++argv[0]))
 			switch (c) {
+			case 's':
+
+				break;
 			case 'a':
 				flags |= ADD;
+				flagAge(flags & LOAD);
 				break;
 			case 'd':
 				flags |= DEL;
@@ -48,11 +55,14 @@ int main(int argc, char *argv[])
 				break;
 			case 'l':
 				flags |= LOAD;
-				return (flagLoad() ? EXIT_SUCCESS : EXIT_FAILURE);
+				flagLoad();
 				break;
 			case 'c':
 				flags |= CREATE;
 				return (flagCreate() ? EXIT_SUCCESS : EXIT_FAILURE);
+				break;
+			case 'p':
+				flagPrint(flags & LOAD);
 				break;
 			default:
 				printf("unknown parameter: -%c\n", c);
@@ -60,13 +70,70 @@ int main(int argc, char *argv[])
 			}
 	}
 
+	saveDB();
+
 	return EXIT_FAILURE;
+}
+
+int flagAge(int load)
+{
+	if (!load) {
+			printf("Before printing any record you have to load database!\n");
+			exit(EXIT_FAILURE);
+	}
+
+	char name[100], surname[100];
+	int age;
+
+	struct Person *np;
+
+	printf("Change age mode...\nEnter name, surname and new age : ");
+	scanf(" %s %s %d", name, surname, &age);
+
+	if ((np = lookUp(peopleDatabase, name, surname)) == NULL) {
+		printf("Can't find person named %s %s.\n", name, surname);
+		return EXIT_FAILURE;
+	}
+
+	setAge(np, age);
+
+	printf("Age changed.\n");
+
+	return 0;
+}
+
+void saveDB()
+{
+	pFile = fopen(FILENAME, "w+");
+	int i;
+
+	for (i = 0; i < 26; i++)
+		if (peopleDatabase[i] != NULL)
+			writePerson(peopleDatabase[i]);
+
+	fclose(pFile);
+}
+
+int flagPrint(int load)
+{
+	if (!load) {
+		printf("Before printing any record you have to load database!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	int i;
+
+	for (i = 0; i < 26; i++)
+		if (peopleDatabase[i] != NULL)
+			printPerson(peopleDatabase[i]);
+
+	return 0;
 }
 
 int flagCreate()
 {
 	if (!createPeopleDB()) {
-		printf("Database creation successfull\nCheck file >%s\n", FILENAME);
+		printf("Database creation successful\nCheck file >%s\n", FILENAME);
 		return EXIT_SUCCESS;
 	} else {
 		printf("Error creating database.");
@@ -74,35 +141,61 @@ int flagCreate()
 	}
 }
 
-int flagDelete(int loaded)
+int flagDelete(int load)
 {
-	if (!loaded) {
+	if (!load) {
 		printf("Before deleting any record you have to load database!\n");
 		exit(EXIT_FAILURE);
 	}
 
-	char *name, *surname;
+	char name[100], surname[100];
 
+	printf("Person killing mode...\nEnter name, surname and new age : ");
+	scanf(" %s %s", name, surname);
 
+	peopleDatabase[hash(surname)] = NULL;
+
+	printf("Person decapitation done.\n");
+
+	return -1;
 }
 
 int flagLoad()
 {
+
+	char line[MAXLINE], name[MAXLINE], surname[MAXLINE];
+
 	pFile = fopen(FILENAME, "r");
-	struct Person *np;
 
-	char *line, *name, *surname;
-	int i, c, age;
-/* 97 line got crashing error (getline func, use another instead) */
-	while ((i = getline(&line, (size_t *) MAXLINE, pFile)) > 0) {
-		sscanf(line, " %s %s %d ", surname, name, &age);
+	int c, i = 0, age;
 
-		if ((np = hashPosition(peopleDatabase, surname))) {
-			np = personCreate(name, surname, age);
-		} else {
-			printf("Error loading db.\n");
-			return EXIT_FAILURE;
+
+	while (1) {
+
+		c = fgetc(pFile);
+
+		line[i++] = c;
+
+		if (c == EOF)
+			return EXIT_SUCCESS;
+
+		if (c == '\n') {
+			sscanf(line, "%s %s %d", name, surname, &age);
+
+//			printf("%s %s %d\n", name, surname, age);
+
+			i = 0;
+
+			peopleDatabase[hash(surname)] = personCreate(name, surname, age);
+
+			if (peopleDatabase[hash(surname)] == NULL) {
+				printf("Error loading db.\n");
+				return EXIT_FAILURE;
+			}
 		}
+
 	}
+
+	fclose(pFile);
 	return EXIT_SUCCESS;
 }

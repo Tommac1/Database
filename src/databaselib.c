@@ -26,10 +26,10 @@ int createPeopleDB();
 unsigned hash(char *s);
 
 const char *names[2][NUMNAMES] = {
-		{ "Maria", "Krystyna", "Anna", "Barbara", "Teresa", "Elżbieta", "Janina", "Zofia", "Jadwiga", "Danuta", "Halina", "Irena",
-		  "Ewa", "Małgorzata", "Helena", "Grażyna", "Bożena", "Stanisława", "Jolanta", "Marianna" },
-		{ "Jan", "Stanisław", "Andrzej", "Józef", "Tadeusz", "Jerzy", "Zbigniew", "Krzysztof", "Henryk", "Ryszard", "Kazimierz",
-		  "Marek", "Marian", "Piotr", "Janusz", "Władysław", "Adam", "Wiesław", "Zdzisław", "Edward" }
+		{ "Maria", "Krystyna", "Anna", "Barbara", "Teresa", "Elzbieta", "Janina", "Zofia", "Jadwiga", "Danuta", "Halina", "Irena",
+		  "Ewa", "Malgorzata", "Helena", "Grazyna", "Bozena", "Stanislawa", "Jolanta", "Marianna" },
+		{ "Jan", "Stanislaw", "Andrzej", "Jozef", "Tadeusz", "Jerzy", "Zbigniew", "Krzysztof", "Henryk", "Ryszard", "Kazimierz",
+		  "Marek", "Marian", "Piotr", "Janusz", "Wladyslaw", "Adam", "Wieslaw", "Zdzislaw", "Edward" }
 };
 
 const char *surnames[2][NUMSURNAMES] = {
@@ -97,6 +97,13 @@ struct Person *personCreate(char *name, char *surname, int age)
 	return np;
 }
 
+void *personDelete(struct Person *np)
+{
+	free(np);
+
+	return 0;
+}
+
 int writePerson(struct Person *p)
 {
 	pFile = fopen(FILENAME, "a+");
@@ -106,11 +113,20 @@ int writePerson(struct Person *p)
 		free(p);
 		return EXIT_FAILURE;
 	} else {
-		printf("Adding person successful.");
+		//printf("Adding person successful.");
 		free(p);
 		fclose(pFile);
 		return EXIT_SUCCESS;
 	}
+}
+
+void printPerson(struct Person *p)
+{
+	char *name = getName(p);
+	char *surname = getSurname(p);
+	int age = getAge(p);
+
+	printf("%s %s %d\n", name, surname, age);
 }
 
 struct Person *lookUp(struct Person *pplArray[], char *name, char *sur)
@@ -124,14 +140,36 @@ struct Person *lookUp(struct Person *pplArray[], char *name, char *sur)
 	return NULL;
 }
 
-struct Person *hashPosition(struct Person *pplArray[], char *sur)
+struct Person *hashInstall(struct Person *pplArray[], char *sur, char *name, int age)
 {
 	int hashval = hash(sur);
 	struct Person *np;
 	for (np = pplArray[hashval]; np != NULL; np = np->next)
 		;
+	np = personCreate(name, sur, age);
 	return np;
 }
+
+void setAge(struct Person*np, int age)
+{
+	np->age = age;
+}
+
+int getAge(struct Person *np)
+{
+	return np->age;
+}
+
+char *getName(struct Person *np)
+{
+	return np->name;
+}
+
+char *getSurname(struct Person *np)
+{
+	return np->surname;
+}
+
 
 unsigned hash(char *s)
 {
