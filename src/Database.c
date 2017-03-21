@@ -17,8 +17,8 @@
 static struct Person *peopleDatabase[26];
 
 int flagCreate();
-int flagDelete(int load);
 int flagLoad();
+int flagDelete(int load);
 int flagAge(int load);
 int flagPrint(int load);
 void saveDB();
@@ -27,21 +27,18 @@ int main(int argc, char *argv[])
 {
 
 	if (argc < 2) {
-		printf("Usable parameters: \n\t-a [NAME] [SURNAME] [AGE]  :  add new person\n\t-d [NAME] [SURNAME] [AGE]  :  delete person\n\t"
-				"-l  :  load existing databse from file\n\t-c  :  create new database \n\t-f [PARAM...]"
-				"  :  find person with given parameter\n\t");
+		printf("Usable parameters: \n\t-a  :  add new person\n\t-d  :  delete person\n\t"
+				"-l  :  load existing databse from file\n\t-c  :  create new database \n\t-p"
+				"  :  print entire database\nBefore working on records you have to load database!\n\t");
 
 	}
 	int c, flags = 0;
 
-	enum { ADD = 01, DEL = 02, FIND = 04, LOAD = 010, CREATE = 020 };
+	enum { ADD = 01, DEL = 02, LOAD = 04, CREATE = 010, PRINT = 020 };
 
 	while (--argc > 0 && (*++argv)[0] == '-') {
 		while ((c = *++argv[0]))
 			switch (c) {
-			case 's':
-
-				break;
 			case 'a':
 				flags |= ADD;
 				flagAge(flags & LOAD);
@@ -49,9 +46,6 @@ int main(int argc, char *argv[])
 			case 'd':
 				flags |= DEL;
 				flagDelete(flags & LOAD);
-				break;
-			case 'f':
-				flags |= FIND;
 				break;
 			case 'l':
 				flags |= LOAD;
@@ -62,6 +56,7 @@ int main(int argc, char *argv[])
 				return (flagCreate() ? EXIT_SUCCESS : EXIT_FAILURE);
 				break;
 			case 'p':
+				flags |= PRINT;
 				flagPrint(flags & LOAD);
 				break;
 			default:
@@ -88,7 +83,10 @@ int flagAge(int load)
 	struct Person *np;
 
 	printf("Change age mode...\nEnter name, surname and new age : ");
-	scanf(" %s %s %d", name, surname, &age);
+	if ((scanf(" %s %s %d", name, surname, &age)) != 3) {
+		printf("Error input data.\n");
+		return EXIT_FAILURE;
+	}
 
 	if ((np = lookUp(peopleDatabase, name, surname)) == NULL) {
 		printf("Can't find person named %s %s.\n", name, surname);
@@ -99,7 +97,7 @@ int flagAge(int load)
 
 	printf("Age changed.\n");
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 void saveDB()
@@ -157,7 +155,7 @@ int flagDelete(int load)
 
 	printf("Person decapitation done.\n");
 
-	return -1;
+	return EXIT_SUCCESS;
 }
 
 int flagLoad()
@@ -169,9 +167,7 @@ int flagLoad()
 
 	int c, i = 0, age;
 
-
 	while (1) {
-
 		c = fgetc(pFile);
 
 		line[i++] = c;
