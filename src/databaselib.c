@@ -58,7 +58,7 @@ int createPeopleDB()
 		if (!randName || !randSurname) {
 			printf("Error randomizing name / surname\n");
 			fclose(pFile);
-			return 1;
+			return EXIT_FAILURE;
 		}
 		randAge = (rand() % 51) + 20; /* age range 20-70 */
 
@@ -72,13 +72,13 @@ int createPeopleDB()
 		if (!fprintf(pFile, "%s %s %d\n", np->name, np->surname, np->age)) {
 			printf("Error writing person %d to file\n", nPer);
 			fclose(pFile);
-			return 1;
+			return EXIT_FAILURE;
 		}
 	}
 	free(np);
 	fclose(pFile);
 
-	return 0;
+	return EXIT_SUCCESS;
 }
 
 struct Person *personCreate(char *name, char *surname, int age)
@@ -95,13 +95,6 @@ struct Person *personCreate(char *name, char *surname, int age)
 	np->age = age;
 
 	return np;
-}
-
-void *personDelete(struct Person *np)
-{
-	free(np);
-
-	return 0;
 }
 
 int writePerson(struct Person *p)
@@ -169,7 +162,6 @@ char *getSurname(struct Person *np)
 {
 	return np->surname;
 }
-
 
 unsigned hash(char *s)
 {

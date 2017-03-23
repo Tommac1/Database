@@ -30,7 +30,6 @@ int main(int argc, char *argv[])
 		printf("Usable parameters: \n\t-a  :  add new person\n\t-d  :  delete person\n\t"
 				"-l  :  load existing databse from file\n\t-c  :  create new database \n\t-p"
 				"  :  print entire database\nBefore working on records you have to load database!\n\t");
-
 	}
 	int c, flags = 0;
 
@@ -73,7 +72,7 @@ int main(int argc, char *argv[])
 int flagAge(int load)
 {
 	if (!load) {
-			printf("Before printing any record you have to load database!\n");
+			printf("Before working on any record you have to load database!\n");
 			exit(EXIT_FAILURE);
 	}
 
@@ -148,7 +147,7 @@ int flagDelete(int load)
 
 	char name[100], surname[100];
 
-	printf("Person killing mode...\nEnter name, surname and new age : ");
+	printf("Person killing mode...\nEnter name, surname : ");
 	scanf(" %s %s", name, surname);
 
 	peopleDatabase[hash(surname)] = NULL;

@@ -21,7 +21,6 @@ FILE *pFile;
 
 struct Person *personCreate(char *name, char *surname, int age);
 int writePerson(struct Person *p);
-void *personDelete(struct Person *np);
 int createPeopleDB();
 unsigned hash(char *s);
 struct Person *lookUp(struct Person *pplArray[], char *name, char *sur);
