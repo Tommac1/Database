@@ -41,28 +41,28 @@ const char *surnames[2][NUMSURNAMES] = {
 		  "Krawczyk", "Piotrowski", "Grabowski", "Nowakowski", "Pawlowski", "Michalski" }
 };
 
-int createPeopleDB()
+int createPeopleDB(int sranded)
 {
 	pFile = fopen(FILENAME, "w+");
 
-	int nPer, randSex, randAge;
-	char *randName, *randSurname;
+	int nPer, randSex, rAge;
+	char *rName, *rSurname;
 	struct Person *np;
 
-	srand((unsigned int) time(NULL)); /* unsigned int to get rid of compilator warning */
+	if (!sranded) srand((unsigned int) time(NULL)); /* unsigned int to get rid of compilator warning */
 
 	for (nPer = 0; nPer < NUMPEOPLE; nPer++) {
 		randSex = rand() % 2; /* 0 - man, 1 - woman */
-		randName = strdup(names[randSex][rand() % NUMNAMES]);
-		randSurname = strdup(surnames[randSex][rand() % NUMSURNAMES]);
-		if (!randName || !randSurname) {
+		rName = randName(randSex);
+		rSurname = randSurname(randSex);
+		if (!rName || !rSurname) {
 			printf("Error randomizing name / surname\n");
 			fclose(pFile);
 			return EXIT_FAILURE;
 		}
-		randAge = (rand() % 51) + 20; /* age range 20-70 */
+		rAge = randAge(0, 90);
 
-		np = personCreate(randName, randSurname, randAge);
+		np = personCreate(rName, rSurname, rAge);
 
 		if (!np) {
 			printf("Error allocating person %d: %s %s\n", nPer, np->name, np->surname);
@@ -95,6 +95,34 @@ struct Person *personCreate(char *name, char *surname, int age)
 	np->age = age;
 
 	return np;
+}
+
+void personDelete(struct Person *p)
+{
+	free(p->name);
+	free(p->surname);
+	free(p);
+	p = NULL;
+}
+
+char *randName(int sex)
+{
+	char *rName;
+	rName = strdup(names[sex][rand() % NUMNAMES]);
+	return rName;
+}
+
+char *randSurname(int sex)
+{
+	char *rsName;
+	rsName = strdup(surnames[sex][rand() % NUMNAMES]);
+	return rsName;
+}
+
+int randAge(int low, int high)
+{
+	int rAge = (rand() % (high - low + 1)) + low;
+	return rAge;
 }
 
 int writePerson(struct Person *p)
@@ -130,17 +158,7 @@ struct Person *lookUp(struct Person *pplArray[], char *name, char *sur)
 		if ((strcmp(sur, pPerson->surname) == 0) && (strcmp(name, pPerson->name) == 0))
 			return pPerson;
 
-	return NULL;
-}
-
-struct Person *hashInstall(struct Person *pplArray[], char *sur, char *name, int age)
-{
-	int hashval = hash(sur);
-	struct Person *np;
-	for (np = pplArray[hashval]; np != NULL; np = np->next)
-		;
-	np = personCreate(name, sur, age);
-	return np;
+	return pPerson;
 }
 
 void setAge(struct Person*np, int age)
