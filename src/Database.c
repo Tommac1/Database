@@ -1,10 +1,10 @@
 /*
  ============================================================================
- Name        : First.c
- Author      : 
- Version     :
- Copyright   : Your copyright notice
- Description : Hello World in C, Ansi-style
+ Name        : Database.c
+ Author      : t.maczkowski
+ Version     : 
+ Copyright   : 
+ Description : A simple database
  ============================================================================
  */
 
@@ -130,6 +130,11 @@ int flagLoad()
 	char line[MAXLINE], name[MAXLINE], surname[MAXLINE];
 
 	pFile = fopen(FILENAME, "r");
+
+	if (!pFile) {
+		printf("Can't open database file.\nDid you create it with -c parameter?\n");
+		exit(EXIT_FAILURE);
+	}
 
 	int c, i = 0, age;
 
